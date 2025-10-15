@@ -1,0 +1,6 @@
+@BlazorAppDubraskaAG.API_HostAddress = http://localhost:5180
+
+GET {{BlazorAppDubraskaAG.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

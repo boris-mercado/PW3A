@@ -1,0 +1,41 @@
+﻿
+@inject NavigationManager navigatorManager
+<h3>LibroFormAddPage</h3>
+<EditForm Model="@oLibroFormCLS" OnValidSubmit="@guardar">
+    <DataAnnotationsValidator />
+    <div class="mt-3">
+        <label>Id Libro</label>
+        <InputNumber class="form-control" @bind-Value="oLibroFormCLS.idLibro" />
+        <ValidationMessage For="(() => oLibroFormCLS.idLibro)" />
+    </div>
+    <div class="mt-3">
+        <label>Titulo</label>
+        <InputText class="form-control" @bind-Value="oLibroFormCLS.titulo" />
+        <ValidationMessage For="(() => oLibroFormCLS.titulo)" />
+
+    </div>
+    <div class="mt-3">
+        <label>Resumen</label>
+        <InputTextArea class="form-control" @bind-Value="oLibroFormCLS.resumen" />
+        <ValidationMessage For="(() => oLibroFormCLS.resumen)" />
+    </div>
+    <div class="mt-3">
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <button class="btn btn-danger" @onclick="@regresar">Regresar</button>
+    </div>
+</EditForm>
+
+@code {
+    public LibroFormCLS oLibroFormCLS { get; set; } = new LibroFormCLS();
+
+    private void guardar()
+    {
+        Console.WriteLine("Guardando");
+    }
+
+    private void regresar()
+    {
+        navigatorManager.NavigateTo("libro");
+    }
+
+}

@@ -1,0 +1,99 @@
+﻿@inject NavigationManager navigationManager
+@inject LibroService libroService
+@inject IJSRuntime JS
+
+@if (lista != null || lista.Count != 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Imgen</th>
+                <th>Id</th>
+                <th>Titulo</th>
+                <th>Nombre Tipo Libro</th>
+                <th>Nombre Archivo</th>
+                <th>Operaciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in lista)
+            {
+                <tr>
+                    <td>
+                        <img width="50" height="50" src="@obtenerImagen(item.imagen)" />
+                    </td>
+                    <td>@item.idlibro</td>
+                    <td>@item.titulo</td>
+                    <td>@item.nombretipolibro</td>
+                    <td> <p @onclick="(() => descargar(item.idlibro, item.nombrearchivo))" style="cursor:pointer; text-decoration:underline">@item.nombrearchivo </p> </td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="(() => recuperarLibro(item.idlibro))">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+                                <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001" />
+                            </svg>
+                        </button>
+                        <button class="btn btn-danger" @onclick="(() => eliminarLibro(item.idlibro))">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0" />
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    public List<LibroListCLS> lista { get; set; } = new List<LibroListCLS>();
+
+
+    //esta funcion carga datos al iniciar la pagina, es decir los libros3
+    protected override async Task OnInitializedAsync()
+    {
+        libroService.OnSearch += filtrar;
+
+        await listarLibros();
+    }
+    private async Task filtrar(string titulo)
+    {
+        lista = await libroService.filtrarLibros(titulo);
+        StateHasChanged();
+        
+    }
+    private async Task listarLibros()
+    {
+        lista = await libroService.ListarLibros();
+    }
+    private void recuperarLibro(int idlibro)
+    {
+        navigationManager.NavigateTo("/formlibro/edit/" + idlibro);
+    }
+
+    private async Task eliminarLibro(int idlibro)
+    {
+        await libroService.eliminarLibro(idlibro);
+        await listarLibros();
+    }
+    //imagen
+    private string obtenerImagen(byte[]? buffer)
+    {
+        if (buffer == null)
+        {
+            return "img/default.png";
+        }
+        else
+        {
+            return "data:image/png;base64," + Convert.ToBase64String(buffer);
+        }
+    }
+    //archivo
+    private async Task descargar(int idlibro, string nombrearchivo)
+    {
+        string archivo = await libroService.recuperarNombrePorId(idlibro);
+        if (archivo != null && archivo.Length > 0)
+        {
+            await JS.InvokeVoidAsync("descargarArchivo", archivo, nombrearchivo);
+        }
+    }
+}
