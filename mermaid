@@ -1,0 +1,9 @@
+# Mi Documentación con Diagramas
+
+## Flujo de inicio de sesión
+
+```mermaid
+flowchart TD
+    A[Usuario entra URL] --> B{Credenciales válidas?};
+    B -- Sí --> C(Acceso concedido);
+    B -- No --> A;
